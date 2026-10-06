@@ -1,7 +1,4 @@
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 pluginManagement {
-    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {
@@ -26,12 +23,13 @@ dependencyResolutionManagement {
         }
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
 
-rootProject.name = "Aurelvio"
+rootProject.name = "build-logic"
 
-include(":androidApp")
-include(":shared")
-include(":core:common")
-include(":domain")
-include(":core:testing")
+include(":convention")

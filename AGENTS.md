@@ -41,8 +41,11 @@ offline, without accounts or a backend.
   unit tests (missing entry on a given day, withdrawals, archived assets).
 
 ## Tech Stack
-- Kotlin 2.4.x, Gradle Kotlin DSL, version catalog, convention plugins
-  in `build-logic`, AGP 9 (separate `androidApp` module).
+- Kotlin 2.4.x, Gradle Kotlin DSL, Version Catalog (`gradle/libs.versions.toml`),
+  Convention Plugins in `build-logic`, AGP 9 (using `com.android.kotlin.multiplatform.library`).
+- JVM Target: Java 17 across all modules.
+- Base package name: `com.kris.aurelvio.<module_path>` (e.g. `com.kris.aurelvio.domain`).
+- Type-safe project accessors enabled (`enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")`).
 - UI: Compose Multiplatform 1.12 + Material 3, Compose Resources (PL/EN).
 - Architecture: Clean Architecture + MVI, feature-based modules.
 - State: JetBrains lifecycle-viewmodel (KMP), StateFlow, coroutines/Flow.
@@ -58,21 +61,37 @@ offline, without accounts or a backend.
 - Quality: detekt, ktlint (Spotless), Kover, GitHub Actions (macOS runner).
 - Before using a library, verify its latest version and KMP support status.
 
-## Module Structure
-build-logic/, androidApp/, iosApp/, shared/ (DI, navigation, theme, iOS framework),
-core/{common,designsystem,testing}, domain/, data/,
-feature/{onboarding,lock,dashboard,assets,entry,quickupdate,history,
-charts,settings,backup}.
+## Convention Plugins (build-logic)
+The project uses an included build (`build-logic`) with precompiled script plugins prefixed with `aurelvio.`:
+- `aurelvio.kmp.library`: Configures KMP library module + AGP 9 Android Multiplatform Library (`com.android.kotlin.multiplatform.library`), targets (`android`, `iosArm64`, `iosSimulatorArm64`), `jvmTarget = 17`, package namespace (`com.kris.aurelvio.<module_path>`), compiler flags (`-Xexpect-actual-classes`), default opt-ins (`ExperimentalCoroutinesApi`, `ExperimentalMaterial3Api`), and `kotlin.test`.
+- `aurelvio.compose.library`: Applies `aurelvio.kmp.library` + Compose Multiplatform + Compose Compiler plugin. Includes core Compose dependencies (runtime, foundation, material3, ui, components-resources, ui-tooling-preview) for `commonMain` and `ui-tooling` for Android.
+- `aurelvio.feature`: Applies `aurelvio.compose.library` + `kotlin.plugin.serialization` + `kotlinx-serialization-json`.
+
+## Module Structure & Dependencies
+### Existing Modules
+- `build-logic/`: Included build containing convention plugins (`:convention`).
+- `androidApp` (`:androidApp`): Regular Android application module (`com.android.application`), entry point `MainActivity`.
+- `shared` (`:shared`): KMP/CMP entry point, navigation, DI, theme, iOS framework generation (`Shared`).
+- `core/common` (`:core:common`): Common infrastructure utilities, base models, extensions.
+- `domain` (`:domain`): Pure Kotlin business logic, calculations, repository interfaces.
+- `core/testing` (`:core:testing`): Test harnesses, test dispatchers, fake implementations.
+
+### Planned Modules
+- `data/` (`:data`): Repository implementations, Room database, DataStore settings.
+- `core/designsystem/` (`:core:designsystem`): Design system UI components, Material 3 theme.
+- `feature/*` (`:feature:dashboard`, `:feature:assets`, `:feature:entry`, `:feature:quickupdate`, `:feature:history`, `:feature:charts`, `:feature:settings`, `:feature:backup`, `:feature:lock`, `:feature:onboarding`).
 
 ## Architecture Rules
-1. Dependencies point inward: feature -> domain <- data. Domain is pure
-   Kotlin, without Compose, Room, or Android.
-2. Feature modules do not depend on each other.
-3. Room entities do not leak outside `data`. Mapping occurs at the boundary.
-4. Screen = `Route` (ViewModel, state collection) + stateless `Screen(state,
-   onAction)`. MVI state: UiState, Action, Effect.
-5. Time handled via injected `Clock`.
-6. Domain and calculation logic first, covered by tests, followed by UI.
+1. **Dependencies point inward**: `feature -> domain <- data`. `:domain` is pure Kotlin without Compose, Room, DataStore, or Android SDK dependencies.
+2. **Module dependencies**:
+   - `:domain` depends ONLY on `:core:common` (and `:core:testing` in `commonTest`).
+   - `:core:testing` depends ONLY on `:core:common` (does NOT depend on `:domain`).
+   - `:shared` depends on `:domain` and `:core:common`.
+   - `feature` modules depend on `:domain` and `:core:designsystem`, but NEVER on each other.
+3. **Room entities** do not leak outside `:data`. Mapping to domain models occurs at the boundary.
+4. **Screen architecture**: `Route` (ViewModel, state collection) + stateless `Screen(state, onAction)`. MVI state: UiState, Action, Effect.
+5. **Time handling**: Time logic handled via injected `Clock`.
+6. **Testing priority**: Domain and calculation logic first, covered by unit tests, followed by UI.
 
 ## Screens
 Onboarding, Lock (PIN/biometrics), Dashboard (net worth, period change,
