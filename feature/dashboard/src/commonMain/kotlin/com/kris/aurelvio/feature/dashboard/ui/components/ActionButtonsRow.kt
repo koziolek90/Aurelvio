@@ -9,14 +9,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import aurelvio.feature.dashboard.generated.resources.Res
 import aurelvio.feature.dashboard.generated.resources.dashboard_add_entry
 import aurelvio.feature.dashboard.generated.resources.dashboard_update_values
@@ -28,7 +27,7 @@ import org.jetbrains.compose.resources.stringResource
 fun ActionButtonsRow(
     onAddEntryClicked: () -> Unit,
     onUpdateValuesClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colors = AurelvioTheme.colors
 
@@ -41,13 +40,13 @@ fun ActionButtonsRow(
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colors.gold,
-                contentColor = Color.Black
-            )
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
         ) {
             Text(
                 text = stringResource(Res.string.dashboard_add_entry),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -61,13 +60,13 @@ fun ActionButtonsRow(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, colors.gold),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = colors.gold
-            )
+                contentColor = colors.gold,
+            ),
         ) {
             Text(
                 text = stringResource(Res.string.dashboard_update_values),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
             )
         }
     }

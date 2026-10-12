@@ -28,9 +28,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +45,14 @@ import aurelvio.feature.dashboard.generated.resources.dashboard_error_title
 import com.kris.aurelvio.core.designsystem.components.AurelvioCard
 import com.kris.aurelvio.core.designsystem.theme.AurelvioSpacing
 import com.kris.aurelvio.core.designsystem.theme.AurelvioTheme
+import com.kris.aurelvio.domain.model.AssetId
+import com.kris.aurelvio.domain.model.Money
 import com.kris.aurelvio.feature.dashboard.data.MockObserveDashboard
+import com.kris.aurelvio.feature.dashboard.model.AssetItem
+import com.kris.aurelvio.feature.dashboard.model.DashboardData
+import com.kris.aurelvio.feature.dashboard.model.NetWorthPoint
+import com.kris.aurelvio.feature.dashboard.model.NetWorthSummary
+import com.kris.aurelvio.feature.dashboard.model.TimeRange
 import com.kris.aurelvio.feature.dashboard.presentation.DashboardAction
 import com.kris.aurelvio.feature.dashboard.presentation.DashboardContent
 import com.kris.aurelvio.feature.dashboard.presentation.DashboardEffect
@@ -57,13 +64,14 @@ import com.kris.aurelvio.feature.dashboard.ui.components.NetWorthChart
 import com.kris.aurelvio.feature.dashboard.ui.components.RangeSelector
 import com.kris.aurelvio.feature.dashboard.ui.components.SummaryCardRow
 import com.kris.aurelvio.feature.dashboard.ui.components.TopAssetsSection
+import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DashboardRoute(
     onEffect: (DashboardEffect) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = viewModel { DashboardViewModel(MockObserveDashboard()) }
+    viewModel: DashboardViewModel = viewModel { DashboardViewModel(MockObserveDashboard()) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -76,7 +84,7 @@ fun DashboardRoute(
     DashboardScreen(
         state = state,
         onAction = viewModel::onAction,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -84,20 +92,20 @@ fun DashboardRoute(
 fun DashboardScreen(
     state: DashboardState,
     onAction: (DashboardAction) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colors = AurelvioTheme.colors
 
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets.safeDrawing,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.TopCenter,
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -105,17 +113,17 @@ fun DashboardScreen(
                     .widthIn(max = 600.dp)
                     .padding(horizontal = AurelvioSpacing.l),
                 contentPadding = PaddingValues(vertical = AurelvioSpacing.l),
-                verticalArrangement = Arrangement.spacedBy(AurelvioSpacing.xl)
+                verticalArrangement = Arrangement.spacedBy(AurelvioSpacing.xl),
             ) {
                 // Header
                 item {
                     Text(
                         text = stringResource(Res.string.app_name).uppercase(),
                         color = colors.gold,
-                        fontSize = 20.sp,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 4.sp,
-                        modifier = Modifier.padding(top = AurelvioSpacing.s)
+                        modifier = Modifier.padding(top = AurelvioSpacing.s),
                     )
                 }
 
@@ -126,7 +134,7 @@ fun DashboardScreen(
                     DashboardContent.Empty -> {
                         item {
                             EmptyStateView(
-                                onAddFirstAssetClicked = { onAction(DashboardAction.AddEntryClicked) }
+                                onAddFirstAssetClicked = { onAction(DashboardAction.AddEntryClicked) },
                             )
                         }
                     }
@@ -134,7 +142,7 @@ fun DashboardScreen(
                         item {
                             ErrorStateView(
                                 message = content.message,
-                                onRetryClicked = { onAction(DashboardAction.Retry) }
+                                onRetryClicked = { onAction(DashboardAction.Retry) },
                             )
                         }
                     }
@@ -148,7 +156,7 @@ fun DashboardScreen(
                         item {
                             RangeSelector(
                                 selectedRange = state.range,
-                                onRangeSelected = { onAction(DashboardAction.RangeSelected(it)) }
+                                onRangeSelected = { onAction(DashboardAction.RangeSelected(it)) },
                             )
                         }
 
@@ -164,14 +172,14 @@ fun DashboardScreen(
                             TopAssetsSection(
                                 assets = data.topAssets,
                                 onSeeAllClicked = { onAction(DashboardAction.SeeAllAssetsClicked) },
-                                onAssetClicked = { onAction(DashboardAction.AssetClicked(it)) }
+                                onAssetClicked = { onAction(DashboardAction.AssetClicked(it)) },
                             )
                         }
 
                         item {
                             ActionButtonsRow(
                                 onAddEntryClicked = { onAction(DashboardAction.AddEntryClicked) },
-                                onUpdateValuesClicked = { onAction(DashboardAction.UpdateValuesClicked) }
+                                onUpdateValuesClicked = { onAction(DashboardAction.UpdateValuesClicked) },
                             )
                         }
                     }
@@ -188,12 +196,12 @@ private fun LoadingStateView() {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(AurelvioSpacing.xl)
+        verticalArrangement = Arrangement.spacedBy(AurelvioSpacing.xl),
     ) {
         AurelvioCard(modifier = Modifier.fillMaxWidth().height(160.dp)) {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(color = colors.gold)
             }
@@ -206,7 +214,7 @@ private fun LoadingStateView() {
 
 @Composable
 private fun EmptyStateView(
-    onAddFirstAssetClicked: () -> Unit
+    onAddFirstAssetClicked: () -> Unit,
 ) {
     val colors = AurelvioTheme.colors
 
@@ -215,18 +223,18 @@ private fun EmptyStateView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(AurelvioSpacing.xxl),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
                     .background(colors.gold.copy(alpha = 0.15f), CircleShape),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .background(colors.gold, RoundedCornerShape(12.dp))
+                        .background(colors.gold, RoundedCornerShape(12.dp)),
                 )
             }
 
@@ -235,8 +243,8 @@ private fun EmptyStateView(
             Text(
                 text = stringResource(Res.string.dashboard_empty_title),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(AurelvioSpacing.s))
@@ -244,8 +252,8 @@ private fun EmptyStateView(
             Text(
                 text = stringResource(Res.string.dashboard_empty_description),
                 color = colors.mutedText,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
             )
 
             Spacer(modifier = Modifier.height(AurelvioSpacing.xl))
@@ -255,12 +263,13 @@ private fun EmptyStateView(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colors.gold,
-                    contentColor = Color.Black
-                )
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
                 Text(
                     text = stringResource(Res.string.dashboard_empty_action),
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
@@ -270,7 +279,7 @@ private fun EmptyStateView(
 @Composable
 private fun ErrorStateView(
     message: String,
-    onRetryClicked: () -> Unit
+    onRetryClicked: () -> Unit,
 ) {
     val colors = AurelvioTheme.colors
 
@@ -279,13 +288,13 @@ private fun ErrorStateView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(AurelvioSpacing.xl),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(Res.string.dashboard_error_title),
                 color = colors.negative,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(AurelvioSpacing.s))
@@ -293,8 +302,8 @@ private fun ErrorStateView(
             Text(
                 text = message,
                 color = colors.mutedText,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
             )
 
             Spacer(modifier = Modifier.height(AurelvioSpacing.l))
@@ -304,14 +313,81 @@ private fun ErrorStateView(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colors.surfaceElevated,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
             ) {
                 Text(
                     text = stringResource(Res.string.dashboard_error_retry),
-                    fontWeight = FontWeight.SemiBold
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DashboardScreenDataPreview() {
+    AurelvioTheme {
+        DashboardScreen(
+            state = DashboardState(
+                range = TimeRange.ONE_MONTH,
+                content = DashboardContent.Data(
+                    data = DashboardData(
+                        summary = NetWorthSummary(
+                            currentValue = Money(285_430L),
+                            periodChange = Money(45_430L),
+                            valueGain = Money(42_930L),
+                            deposits = Money(2_500L),
+                            totalDeposits = Money(220_000L),
+                            totalProfit = Money(65_430L),
+                        ),
+                        chartPoints = listOf(
+                            NetWorthPoint(LocalDate(2025, 1, 22), Money(240_000L)),
+                            NetWorthPoint(LocalDate(2025, 2, 22), Money(285_430L)),
+                        ),
+                        topAssets = listOf(
+                            AssetItem(AssetId("1"), "ETF MSCI World", "Inwestycje", "#F59E0B", Money(97_350L), Money(11_350L)),
+                            AssetItem(AssetId("2"), "Lokata 12M", "Konta i lokaty", "#10B981", Money(60_000L), Money(2_400L)),
+                        ),
+                    ),
+                ),
+            ),
+            onAction = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DashboardScreenLoadingPreview() {
+    AurelvioTheme {
+        DashboardScreen(
+            state = DashboardState(content = DashboardContent.Loading),
+            onAction = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DashboardScreenEmptyPreview() {
+    AurelvioTheme {
+        DashboardScreen(
+            state = DashboardState(content = DashboardContent.Empty),
+            onAction = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DashboardScreenErrorPreview() {
+    AurelvioTheme {
+        DashboardScreen(
+            state = DashboardState(content = DashboardContent.Error("Nie udało się połączyć z bazą danych.")),
+            onAction = {},
+        )
     }
 }

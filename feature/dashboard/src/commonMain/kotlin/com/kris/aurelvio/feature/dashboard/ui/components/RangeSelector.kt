@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import aurelvio.feature.dashboard.generated.resources.Res
 import aurelvio.feature.dashboard.generated.resources.dashboard_range_1m
 import aurelvio.feature.dashboard.generated.resources.dashboard_range_1y
@@ -30,7 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 fun RangeSelector(
     selectedRange: TimeRange,
     onRangeSelected: (TimeRange) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colors = AurelvioTheme.colors
 
@@ -39,11 +40,11 @@ fun RangeSelector(
             .fillMaxWidth()
             .background(
                 color = colors.surfaceElevated,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
             )
             .padding(AurelvioSpacing.xxs),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         TimeRange.entries.forEach { range ->
             val isSelected = range == selectedRange
@@ -59,17 +60,17 @@ fun RangeSelector(
                     .weight(1f)
                     .clip(RoundedCornerShape(12.dp))
                     .background(
-                        if (isSelected) colors.gold else androidx.compose.ui.graphics.Color.Transparent
+                        if (isSelected) colors.gold else Color.Transparent,
                     )
                     .clickable { onRangeSelected(range) }
                     .padding(vertical = AurelvioSpacing.s),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = label,
-                    color = if (isSelected) androidx.compose.ui.graphics.Color.Black else colors.mutedText,
-                    fontSize = 13.sp,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else colors.mutedText,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 )
             }
         }
