@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kris.aurelvio.core.designsystem.theme.AurelvioTheme
+import com.kris.aurelvio.domain.model.Money
 import com.kris.aurelvio.feature.dashboard.model.NetWorthPoint
 import com.kris.aurelvio.feature.dashboard.ui.format.MoneyFormatter
 
@@ -53,8 +54,8 @@ fun NetWorthChart(
 
     val startDateText = points.firstOrNull()?.date?.toString() ?: ""
     val endDateText = points.lastOrNull()?.date?.toString() ?: ""
-    val startAmount = points.firstOrNull()?.valueGrosze ?: 0L
-    val endAmount = points.lastOrNull()?.valueGrosze ?: 0L
+    val startAmount = points.firstOrNull()?.value ?: Money.ZERO
+    val endAmount = points.lastOrNull()?.value ?: Money.ZERO
 
     val descriptionText = "Wykres majątku netto od ${MoneyFormatter.format(startAmount)} ($startDateText) do ${MoneyFormatter.format(endAmount)} ($endDateText)"
 
@@ -74,7 +75,7 @@ fun NetWorthChart(
                 val width = size.width
                 val height = size.height
 
-                val values = points.map { it.valueGrosze }
+                val values = points.map { it.value.amount }
                 val minVal = values.minOrNull() ?: 0L
                 val maxVal = values.maxOrNull() ?: 1L
                 val rawDiff = (maxVal - minVal).coerceAtLeast(1L)
@@ -103,7 +104,7 @@ fun NetWorthChart(
 
                 val stepX = width / (points.size - 1)
                 val mappedPoints = points.mapIndexed { index, point ->
-                    val normY = (point.valueGrosze - minVal).toFloat() / rawDiff.toFloat()
+                    val normY = (point.value.amount - minVal).toFloat() / rawDiff.toFloat()
                     val x = index * stepX
                     val y = height - verticalPadding - (normY * availableHeight)
                     Offset(x, y)

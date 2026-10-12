@@ -1,6 +1,7 @@
 package com.kris.aurelvio.feature.dashboard.presentation
 
 import app.cash.turbine.test
+import com.kris.aurelvio.domain.model.AssetId
 import com.kris.aurelvio.feature.dashboard.data.MockObserveDashboard
 import com.kris.aurelvio.feature.dashboard.model.TimeRange
 import kotlinx.coroutines.Dispatchers
@@ -118,8 +119,9 @@ class DashboardViewModelTest {
             viewModel.onAction(DashboardAction.SeeAllAssetsClicked)
             assertEquals(DashboardEffect.NavigateToAssets, awaitItem())
 
-            viewModel.onAction(DashboardAction.AssetClicked("123"))
-            assertEquals(DashboardEffect.NavigateToAsset("123"), awaitItem())
+            val assetId = AssetId("123")
+            viewModel.onAction(DashboardAction.AssetClicked(assetId))
+            assertEquals(DashboardEffect.NavigateToAsset(assetId), awaitItem())
         }
     }
 }

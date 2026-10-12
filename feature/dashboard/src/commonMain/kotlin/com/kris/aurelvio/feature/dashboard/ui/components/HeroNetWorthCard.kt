@@ -48,7 +48,7 @@ fun HeroNetWorthCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = MoneyFormatter.format(summary.currentValueGrosze),
+                    text = MoneyFormatter.format(summary.currentValue),
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
@@ -56,8 +56,8 @@ fun HeroNetWorthCard(
                 )
 
                 TrendBadge(
-                    text = MoneyFormatter.format(summary.periodChangeGrosze, includeSign = true),
-                    isPositive = summary.periodChangeGrosze >= 0
+                    text = MoneyFormatter.format(summary.periodChange, includeSign = true),
+                    isPositive = summary.periodChange.isPositive || summary.periodChange.isZero
                 )
             }
 
@@ -71,8 +71,8 @@ fun HeroNetWorthCard(
                 )
                 Spacer(modifier = Modifier.width(AurelvioSpacing.xs))
                 Text(
-                    text = MoneyFormatter.format(summary.valueGainGrosze, includeSign = true),
-                    color = if (summary.valueGainGrosze >= 0) colors.positive else colors.negative,
+                    text = MoneyFormatter.format(summary.valueGain, includeSign = true),
+                    color = if (summary.valueGain.isPositive || summary.valueGain.isZero) colors.positive else colors.negative,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -86,7 +86,7 @@ fun HeroNetWorthCard(
                 )
                 Spacer(modifier = Modifier.width(AurelvioSpacing.xs))
                 Text(
-                    text = MoneyFormatter.format(summary.depositsGrosze, includeSign = true),
+                    text = MoneyFormatter.format(summary.deposits, includeSign = true),
                     color = colors.goldSoft,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold

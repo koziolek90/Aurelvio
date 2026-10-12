@@ -40,7 +40,7 @@ fun SummaryCardRow(
                 )
                 Spacer(modifier = Modifier.height(AurelvioSpacing.xs))
                 Text(
-                    text = MoneyFormatter.format(summary.totalDepositsGrosze),
+                    text = MoneyFormatter.format(summary.totalDeposits),
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -60,8 +60,8 @@ fun SummaryCardRow(
                 )
                 Spacer(modifier = Modifier.height(AurelvioSpacing.xs))
                 Text(
-                    text = MoneyFormatter.format(summary.totalProfitGrosze, includeSign = true),
-                    color = if (summary.totalProfitGrosze >= 0) colors.positive else colors.negative,
+                    text = MoneyFormatter.format(summary.totalProfit, includeSign = true),
+                    color = if (summary.totalProfit.isPositive || summary.totalProfit.isZero) colors.positive else colors.negative,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )

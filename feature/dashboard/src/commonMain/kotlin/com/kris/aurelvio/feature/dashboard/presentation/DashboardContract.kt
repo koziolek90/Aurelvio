@@ -1,5 +1,6 @@
 package com.kris.aurelvio.feature.dashboard.presentation
 
+import com.kris.aurelvio.domain.model.AssetId
 import com.kris.aurelvio.feature.dashboard.model.DashboardData
 import com.kris.aurelvio.feature.dashboard.model.TimeRange
 
@@ -20,7 +21,7 @@ sealed interface DashboardAction {
     data object AddEntryClicked : DashboardAction
     data object UpdateValuesClicked : DashboardAction
     data object SeeAllAssetsClicked : DashboardAction
-    data class AssetClicked(val id: String) : DashboardAction
+    data class AssetClicked(val id: AssetId) : DashboardAction
     data object Retry : DashboardAction
 }
 
@@ -28,5 +29,5 @@ sealed interface DashboardEffect {
     data object NavigateToAddEntry : DashboardEffect
     data object NavigateToQuickUpdate : DashboardEffect
     data object NavigateToAssets : DashboardEffect
-    data class NavigateToAsset(val id: String) : DashboardEffect
+    data class NavigateToAsset(val id: AssetId) : DashboardEffect
 }

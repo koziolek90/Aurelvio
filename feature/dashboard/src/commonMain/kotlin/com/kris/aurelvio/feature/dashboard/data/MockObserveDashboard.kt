@@ -1,5 +1,7 @@
 package com.kris.aurelvio.feature.dashboard.data
 
+import com.kris.aurelvio.domain.model.AssetId
+import com.kris.aurelvio.domain.model.Money
 import com.kris.aurelvio.feature.dashboard.model.AssetItem
 import com.kris.aurelvio.feature.dashboard.model.DashboardData
 import com.kris.aurelvio.feature.dashboard.model.NetWorthPoint
@@ -28,7 +30,14 @@ class MockObserveDashboard(
         if (isEmpty) {
             emit(
                 DashboardData(
-                    summary = NetWorthSummary(0, 0, 0, 0, 0, 0),
+                    summary = NetWorthSummary(
+                        currentValue = Money.ZERO,
+                        periodChange = Money.ZERO,
+                        valueGain = Money.ZERO,
+                        deposits = Money.ZERO,
+                        totalDeposits = Money.ZERO,
+                        totalProfit = Money.ZERO
+                    ),
                     chartPoints = emptyList(),
                     topAssets = emptyList()
                 )
@@ -45,8 +54,8 @@ class MockObserveDashboard(
             TimeRange.ALL -> 60 to 14
         }
 
-        val baseValue = 240_000_00L
-        val targetValue = 285_430_50L
+        val baseValue = 240_000L
+        val targetValue = 285_430L
         val totalGrowth = targetValue - baseValue
 
         val points = mutableListOf<NetWorthPoint>()
@@ -55,40 +64,40 @@ class MockObserveDashboard(
             val progress = (pointCount - 1 - i).toDouble() / (pointCount - 1).coerceAtLeast(1)
 
             val linearPart = baseValue + (totalGrowth * progress).toLong()
-            val fluctuation = (kotlin.math.sin(i * 0.8) * 1_200_00).toLong()
-            val depositJump = if (i < pointCount / 2) 5_000_00L else 0L
+            val fluctuation = (kotlin.math.sin(i * 0.8) * 1_200).toLong()
+            val depositJump = if (i < pointCount / 2) 5_000L else 0L
 
-            val calculatedVal = (linearPart + fluctuation + depositJump).coerceAtLeast(10_000_00L)
+            val calculatedVal = (linearPart + fluctuation + depositJump).coerceAtLeast(10_000L)
             val finalVal = if (i == 0) targetValue else calculatedVal
 
-            points.add(NetWorthPoint(date, finalVal))
+            points.add(NetWorthPoint(date, Money(finalVal)))
         }
 
-        val periodChange = targetValue - points.first().valueGrosze
+        val periodChange = targetValue - points.first().value.amount
         val periodDeposits = when (range) {
-            TimeRange.ONE_MONTH -> 2_500_00L
-            TimeRange.SIX_MONTHS -> 8_000_00L
-            TimeRange.ONE_YEAR -> 15_000_00L
-            TimeRange.ALL -> 45_000_00L
+            TimeRange.ONE_MONTH -> 2_500L
+            TimeRange.SIX_MONTHS -> 8_000L
+            TimeRange.ONE_YEAR -> 15_000L
+            TimeRange.ALL -> 45_000L
         }
         val valueGain = periodChange - periodDeposits
 
         val summary = NetWorthSummary(
-            currentValueGrosze = targetValue,
-            periodChangeGrosze = periodChange,
-            valueGainGrosze = valueGain,
-            depositsGrosze = periodDeposits,
-            totalDepositsGrosze = 220_000_00L,
-            totalProfitGrosze = 65_430_50L
+            currentValue = Money(targetValue),
+            periodChange = Money(periodChange),
+            valueGain = Money(valueGain),
+            deposits = Money(periodDeposits),
+            totalDeposits = Money(220_000L),
+            totalProfit = Money(65_430L)
         )
 
         val assets = listOf(
-            AssetItem("1", "ETF MSCI World", "Inwestycje", "#F59E0B", 97_350_00L, 11_350_00L),
-            AssetItem("2", "Lokata 12M", "Konta i lokaty", "#10B981", 60_000_00L, 2_400_00L),
-            AssetItem("3", "Konto oszczędnościowe", "Konta i lokaty", "#3B82F6", 48_200_00L, 1_200_00L),
-            AssetItem("4", "Akcje GPW", "Inwestycje", "#8B5CF6", 41_280_50L, -1_820_00L),
-            AssetItem("5", "Obligacje EDO", "Obligacje", "#EC4899", 30_000_00L, 1_500_00L),
-            AssetItem("6", "Gotówka", "Gotówka", "#6B7280", 8_600_00L, 0L)
+            AssetItem(AssetId("1"), "ETF MSCI World", "Inwestycje", "#F59E0B", Money(97_350L), Money(11_350L)),
+            AssetItem(AssetId("2"), "Lokata 12M", "Konta i lokaty", "#10B981", Money(60_000L), Money(2_400L)),
+            AssetItem(AssetId("3"), "Konto oszczędnościowe", "Konta i lokaty", "#3B82F6", Money(48_200L), Money(1_200L)),
+            AssetItem(AssetId("4"), "Akcje GPW", "Inwestycje", "#8B5CF6", Money(41_280L), Money(-1_820L)),
+            AssetItem(AssetId("5"), "Obligacje EDO", "Obligacje", "#EC4899", Money(30_000L), Money(1_500L)),
+            AssetItem(AssetId("6"), "Gotówka", "Gotówka", "#6B7280", Money(8_600L), Money.ZERO)
         )
 
         emit(

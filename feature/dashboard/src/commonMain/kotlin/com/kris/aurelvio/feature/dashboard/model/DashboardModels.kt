@@ -1,39 +1,41 @@
 package com.kris.aurelvio.feature.dashboard.model
 
+import com.kris.aurelvio.domain.model.AssetId
+import com.kris.aurelvio.domain.model.Money
 import kotlinx.datetime.LocalDate
 
 enum class TimeRange {
     ONE_MONTH,
     SIX_MONTHS,
     ONE_YEAR,
-    ALL
+    ALL,
 }
 
 data class AssetItem(
-    val id: String,
+    val id: AssetId,
     val name: String,
     val category: String,
     val colorHex: String,
-    val valueGrosze: Long,
-    val profitGrosze: Long
+    val value: Money,
+    val profit: Money,
 )
 
 data class NetWorthPoint(
     val date: LocalDate,
-    val valueGrosze: Long
+    val value: Money,
 )
 
 data class NetWorthSummary(
-    val currentValueGrosze: Long,
-    val periodChangeGrosze: Long,
-    val valueGainGrosze: Long,
-    val depositsGrosze: Long,
-    val totalDepositsGrosze: Long,
-    val totalProfitGrosze: Long
+    val currentValue: Money,
+    val periodChange: Money,
+    val valueGain: Money,
+    val deposits: Money,
+    val totalDeposits: Money,
+    val totalProfit: Money,
 )
 
 data class DashboardData(
     val summary: NetWorthSummary,
     val chartPoints: List<NetWorthPoint>,
-    val topAssets: List<AssetItem>
+    val topAssets: List<AssetItem>,
 )

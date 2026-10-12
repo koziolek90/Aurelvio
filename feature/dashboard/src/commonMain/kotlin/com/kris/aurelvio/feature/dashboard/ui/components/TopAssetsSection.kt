@@ -28,6 +28,7 @@ import aurelvio.feature.dashboard.generated.resources.dashboard_top_assets_title
 import com.kris.aurelvio.core.designsystem.components.AurelvioCard
 import com.kris.aurelvio.core.designsystem.theme.AurelvioSpacing
 import com.kris.aurelvio.core.designsystem.theme.AurelvioTheme
+import com.kris.aurelvio.domain.model.AssetId
 import com.kris.aurelvio.feature.dashboard.model.AssetItem
 import com.kris.aurelvio.feature.dashboard.ui.format.MoneyFormatter
 import org.jetbrains.compose.resources.stringResource
@@ -36,7 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 fun TopAssetsSection(
     assets: List<AssetItem>,
     onSeeAllClicked: () -> Unit,
-    onAssetClicked: (String) -> Unit,
+    onAssetClicked: (AssetId) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = AurelvioTheme.colors
@@ -123,14 +124,14 @@ private fun AssetRowItem(
 
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                text = MoneyFormatter.format(asset.valueGrosze),
+                text = MoneyFormatter.format(asset.value),
                 color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = MoneyFormatter.format(asset.profitGrosze, includeSign = true),
-                color = if (asset.profitGrosze >= 0) colors.positive else colors.negative,
+                text = MoneyFormatter.format(asset.profit, includeSign = true),
+                color = if (asset.profit.isPositive || asset.profit.isZero) colors.positive else colors.negative,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
