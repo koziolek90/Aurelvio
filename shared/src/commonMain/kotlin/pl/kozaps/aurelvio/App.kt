@@ -1,49 +1,48 @@
 package pl.kozaps.aurelvio
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import aurelvio.shared.generated.resources.Res
-import aurelvio.shared.generated.resources.compose_multiplatform
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import com.kris.aurelvio.core.designsystem.theme.AurelvioTheme
+import com.kris.aurelvio.feature.dashboard.presentation.DashboardEffect
+import com.kris.aurelvio.feature.dashboard.ui.DashboardRoute
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import aurelvio.feature.dashboard.generated.resources.Res as DashboardRes
+import aurelvio.feature.dashboard.generated.resources.snackbar_add_entry
+import aurelvio.feature.dashboard.generated.resources.snackbar_asset_detail
+import aurelvio.feature.dashboard.generated.resources.snackbar_assets
+import aurelvio.feature.dashboard.generated.resources.snackbar_quick_update
 
 @Composable
-@Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    AurelvioTheme {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val coroutineScope = rememberCoroutineScope()
+
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) }
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+            DashboardRoute(
+                onEffect = { effect ->
+                    coroutineScope.launch {
+                        val message = when (effect) {
+                            is DashboardEffect.NavigateToAddEntry ->
+                                getString(DashboardRes.string.snackbar_add_entry)
+                            is DashboardEffect.NavigateToQuickUpdate ->
+                                getString(DashboardRes.string.snackbar_quick_update)
+                            is DashboardEffect.NavigateToAssets ->
+                                getString(DashboardRes.string.snackbar_assets)
+                            is DashboardEffect.NavigateToAsset ->
+                                getString(DashboardRes.string.snackbar_asset_detail)
+                        }
+                        snackbarHostState.showSnackbar(message)
+                    }
                 }
-            }
+            )
         }
     }
 }

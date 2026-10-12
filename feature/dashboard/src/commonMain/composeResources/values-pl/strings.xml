@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Aurelvio</string>
+    <string name="dashboard_net_worth_label">Majątek netto</string>
+    <string name="dashboard_value_gain_label">w tym wzrost wartości:</string>
+    <string name="dashboard_deposits_label">wpłaty:</string>
+    <string name="dashboard_total_deposits_label">Suma wpłat</string>
+    <string name="dashboard_total_profit_label">Zysk / strata</string>
+    <string name="dashboard_top_assets_title">Największe aktywa</string>
+    <string name="dashboard_see_all_assets">Zobacz wszystkie</string>
+    <string name="dashboard_add_entry">Dodaj wpis</string>
+    <string name="dashboard_update_values">Aktualizuj wartości</string>
+    <string name="dashboard_range_1m">1M</string>
+    <string name="dashboard_range_6m">6M</string>
+    <string name="dashboard_range_1y">1R</string>
+    <string name="dashboard_range_all">Wszystko</string>
+    <string name="dashboard_empty_title">Brak wpisów</string>
+    <string name="dashboard_empty_description">Dodaj pierwsze aktywo, aby zacząć śledzić swój majątek netto.</string>
+    <string name="dashboard_empty_action">Dodaj pierwsze aktywo</string>
+    <string name="dashboard_error_title">Coś poszło nie tak</string>
+    <string name="dashboard_error_retry">Spróbuj ponownie</string>
+    <string name="snackbar_add_entry">Wkrótce: Dodaj wpis</string>
+    <string name="snackbar_quick_update">Wkrótce: Aktualizuj wartości</string>
+    <string name="snackbar_assets">Wkrótce: Lista aktywów</string>
+    <string name="snackbar_asset_detail">Wkrótce: Szczegóły aktywa</string>
+</resources>

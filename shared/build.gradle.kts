@@ -29,6 +29,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.feature.dashboard)
+            implementation(projects.core.designsystem)
             implementation(projects.domain)
             implementation(projects.core.common)
             implementation(libs.androidx.lifecycle.viewmodel.compose)

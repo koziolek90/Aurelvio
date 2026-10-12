@@ -12,9 +12,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.findLibrary("kotlinx-serialization-json").get())
+            implementation(project(":core:designsystem"))
             // do włączenia po dodaniu modułów:
-            // implementation(projects.domain)
-            // implementation(projects.core.designsystem)
+            // implementation(project(":domain"))
         }
     }
 }

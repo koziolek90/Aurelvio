@@ -1,5 +1,6 @@
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.compose.ComposeExtension
 
 plugins {
     id("aurelvio.kmp.library")
@@ -8,6 +9,11 @@ plugins {
 }
 
 val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+val composeExtension = extensions.getByType<ComposeExtension>()
+composeExtension.extensions.configure<org.jetbrains.compose.resources.ResourcesExtension>("resources") {
+    publicResClass = true
+}
 
 kotlin {
     sourceSets {

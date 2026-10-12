@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Aurelvio</string>
+    <string name="dashboard_net_worth_label">Net worth</string>
+    <string name="dashboard_value_gain_label">incl. value gain:</string>
+    <string name="dashboard_deposits_label">deposits:</string>
+    <string name="dashboard_total_deposits_label">Total deposits</string>
+    <string name="dashboard_total_profit_label">Profit / loss</string>
+    <string name="dashboard_top_assets_title">Largest assets</string>
+    <string name="dashboard_see_all_assets">See all</string>
+    <string name="dashboard_add_entry">Add entry</string>
+    <string name="dashboard_update_values">Quick update</string>
+    <string name="dashboard_range_1m">1M</string>
+    <string name="dashboard_range_6m">6M</string>
+    <string name="dashboard_range_1y">1Y</string>
+    <string name="dashboard_range_all">All</string>
+    <string name="dashboard_empty_title">No entries yet</string>
+    <string name="dashboard_empty_description">Add your first asset to start tracking your net worth.</string>
+    <string name="dashboard_empty_action">Add first asset</string>
+    <string name="dashboard_error_title">Something went wrong</string>
+    <string name="dashboard_error_retry">Try again</string>
+    <string name="snackbar_add_entry">Coming soon: Add entry</string>
+    <string name="snackbar_quick_update">Coming soon: Quick update</string>
+    <string name="snackbar_assets">Coming soon: Assets list</string>
+    <string name="snackbar_asset_detail">Coming soon: Asset details</string>
+</resources>

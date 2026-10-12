@@ -65,7 +65,7 @@ offline, without accounts or a backend.
 The project uses an included build (`build-logic`) with precompiled script plugins prefixed with `aurelvio.`:
 - `aurelvio.kmp.library`: Configures KMP library module + AGP 9 Android Multiplatform Library (`com.android.kotlin.multiplatform.library`), targets (`android`, `iosArm64`, `iosSimulatorArm64`), `jvmTarget = 17`, package namespace (`com.kris.aurelvio.<module_path>`), compiler flags (`-Xexpect-actual-classes`), default opt-ins (`ExperimentalCoroutinesApi`, `ExperimentalMaterial3Api`), and `kotlin.test`.
 - `aurelvio.compose.library`: Applies `aurelvio.kmp.library` + Compose Multiplatform + Compose Compiler plugin. Includes core Compose dependencies (runtime, foundation, material3, ui, components-resources, ui-tooling-preview) for `commonMain` and `ui-tooling` for Android.
-- `aurelvio.feature`: Applies `aurelvio.compose.library` + `kotlin.plugin.serialization` + `kotlinx-serialization-json`.
+- `aurelvio.feature`: Applies `aurelvio.compose.library` + `kotlin.plugin.serialization` + `kotlinx-serialization-json` + `project(":core:designsystem")`.
 
 ## Module Structure & Dependencies
 ### Existing Modules
@@ -73,45 +73,74 @@ The project uses an included build (`build-logic`) with precompiled script plugi
 - `androidApp` (`:androidApp`): Regular Android application module (`com.android.application`), entry point `MainActivity`.
 - `shared` (`:shared`): KMP/CMP entry point, navigation, DI, theme, iOS framework generation (`Shared`).
 - `core/common` (`:core:common`): Common infrastructure utilities, base models, extensions.
+- `core/designsystem` (`:core:designsystem`): Design system UI theme (`AurelvioTheme`, `AurelvioColors`), shapes, spacing, `AurelvioCard`, `TrendBadge`.
 - `domain` (`:domain`): Pure Kotlin business logic, calculations, repository interfaces.
 - `core/testing` (`:core:testing`): Test harnesses, test dispatchers, fake implementations.
+- `feature/dashboard` (`:feature:dashboard`): Dashboard screen (MVI), net worth chart (Canvas), range selector, top assets, summary cards.
 
 ### Planned Modules
 - `data/` (`:data`): Repository implementations, Room database, DataStore settings.
-- `core/designsystem/` (`:core:designsystem`): Design system UI components, Material 3 theme.
-- `feature/*` (`:feature:dashboard`, `:feature:assets`, `:feature:entry`, `:feature:quickupdate`, `:feature:history`, `:feature:charts`, `:feature:settings`, `:feature:backup`, `:feature:lock`, `:feature:onboarding`).
+- `feature/*` (`:feature:assets`, `:feature:entry`, `:feature:quickupdate`, `:feature:history`, `:feature:charts`, `:feature:settings`, `:feature:backup`, `:feature:lock`, `:feature:onboarding`).
 
 ## Architecture Rules
 1. **Dependencies point inward**: `feature -> domain <- data`. `:domain` is pure Kotlin without Compose, Room, DataStore, or Android SDK dependencies.
 2. **Module dependencies**:
    - `:domain` depends ONLY on `:core:common` (and `:core:testing` in `commonTest`).
    - `:core:testing` depends ONLY on `:core:common` (does NOT depend on `:domain`).
-   - `:shared` depends on `:domain` and `:core:common`.
-   - `feature` modules depend on `:domain` and `:core:designsystem`, but NEVER on each other.
+   - `:shared` depends on `:feature:dashboard`, `:core:designsystem`, `:domain`, `:core:common`.
+   - `feature` modules depend on `:core:designsystem` and `:core:common` (and `:domain` once added), but NEVER on each other.
 3. **Room entities** do not leak outside `:data`. Mapping to domain models occurs at the boundary.
 4. **Screen architecture**: `Route` (ViewModel, state collection) + stateless `Screen(state, onAction)`. MVI state: UiState, Action, Effect.
 5. **Time handling**: Time logic handled via injected `Clock`.
 6. **Testing priority**: Domain and calculation logic first, covered by unit tests, followed by UI.
 
-## Screens
-Onboarding, Lock (PIN/biometrics), Dashboard (net worth, period change,
-profit, breakdown, chart), Asset list, Asset details, Add/edit
-asset, Add entry, Quick update (multiple assets at once), Entry
-history, Charts, Categories, Settings, Backup.
+## Konwencje MVI i UI
+1. **Struktura kontraktu**: Każdy ekran posiada plik `Contract.kt` definiujący:
+   - `UiState`: pojedynczy, niemutowalny stan zawierający sealed `Content` (`Loading`, `Empty`, `Data`, `Error`).
+   - `Action`: interakcje użytkownika i zdarzenia UI (sealed interface).
+   - `Effect`: jednorazowe zdarzenia nawigacji lub powiadomień (sealed interface).
+2. **Architektura Route + Screen**:
+   - `Route`: odpowiedzialna za powiązanie z ViewModel, zbieranie stanu (`collectAsStateWithLifecycle`), przechwytywanie efektów w `LaunchedEffect` i przekazywanie ich dalej.
+   - `Screen`: czysty, bezstanowy Composable przyjmujący `state` i callback `onAction`. Bez bezpośrednich odwołań do ViewModelu.
+3. **Brak logiki biznesowej w Composable**: Wszystkie przeliczenia, transformacje i obsługa zdarzeń znajdują się w ViewModelu lub wydzielonych klasach domeny/data.
+4. **Lokalizacja tekstów**: 100% tekstów UI w zasobach Compose Resources (`values/strings.xml` i `values-pl/strings.xml`). Brak twardo wpisanych ciągów znaków w kodzie UI.
+5. **Reguła trzech dla komponentów**: Komponenty trafiają do `:core:designsystem` dopiero, gdy są współdzielone przez co najmniej 3 ekrany. Do tego czasu pozostają w module danej funkcji.
+6. **Wersje podglądu (Previews)**: Każdy Composable ekranu posiada podglądy `@Preview` reprezentujące różne stany (`Data`, `Loading`, `Empty`, `Error`).
 
-## Visual Design
-Material 3, dark theme by default: deep navy/black with gold accent,
-large readable numbers, minimalism. Profit in green, loss in red (not only
-by color, but also with +/- sign).
+## Reguły domeny
 
-## Privacy & Data
-- No INTERNET permission in release build, no analytics.
-- Backup: JSON export/import with `schemaVersion` (import in a single
-  transaction) and CSV export. Backup reminder in app.
+### Dane
+- Pieniądze: `Money(minorUnits: Long)`, wartość `value class`, zero `Double`
+  dla kwot. Udziały procentowe (donut) mogą być `Double`.
+- Wpis (`Entry`): data (`LocalDate`), wartość aktywa PO wpisie (>= 0),
+  dopłata ze znakiem (+ wpłata, - wypłata, domyślnie 0), notatka.
+- Kilka wpisów jednego aktywa w tym samym dniu jest dozwolone.
+  Porządek: (data, id). Wartość = wartość ostatniego wpisu,
+  dopłaty z tego dnia się sumują.
+- Wpis z datą z przyszłości jest niedozwolony ("dziś" z `DateProvider`).
 
-## Working Rules
-- Break tasks down into small steps with clear "done when..." criteria.
-- Ask before making major architectural changes or adding new dependencies.
-- Code must pass ktlint, detekt, and tests. Do not leave dead code.
-- When uncertain or documentation is unclear, state it instead of guessing.
-- Respond in Polish, write code comments and names in English.
+### Obliczenia
+- Wartość aktywa w dniu X = wartość ostatniego wpisu o dacie <= X.
+  Brak takiego wpisu = aktywo jeszcze nie istnieje (w sumach liczone jako 0).
+- Majątek netto w dniu X = suma wartości wszystkich aktywów w dniu X.
+- Suma dopłat netto w dniu X = suma dopłat ze wpisów o dacie <= X.
+- Zysk = wartość - suma dopłat netto (dla aktywa i dla całości).
+  To prosta różnica, nie stopa zwrotu.
+- Wartość początkowa przy tworzeniu aktywa = pierwszy wpis; domyślnie
+  liczona jako dopłata w tej samej kwocie (przełącznik). Gdy wynosi 0,
+  pierwszy wpis nie powstaje.
+- Zamknięcie aktywa (archiwizacja) = wpis z wartością 0 i wypłatą całej
+  ostatniej wartości, potem flaga isArchived. Dzięki temu majątek i zysk
+  zrealizowany liczą się poprawnie bez specjalnych wyjątków. Odarchiwizacja
+  tylko zdejmuje flagę.
+
+### Styl kodu
+- Identyfikatory jako value class (`AssetId`, `EntryId`, `CategoryId`).
+- Osobne typy szkiców (`AssetDraft`, `EntryDraft`) bez id vs. modele zapisane.
+- Use case'y: klasa z `operator fun invoke`, błędy walidacji zwracane jako
+  `Outcome.Failure(sealed error)`, nie wyjątki.
+- Domena nie importuje androidx.*, Compose, Room ani niczego z platformy.
+- Podejście TDD: najpierw testy (kotlin.test, kotlinx-coroutines-test,
+  Turbine dla Flow), potem implementacja. Nazwy testów opisowe.
+- Każdy krok kończy się: `./gradlew spotlessCheck detekt :core:common:allTests
+  :domain:allTests` na zielono.
