@@ -30,6 +30,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.feature.dashboard)
+            implementation(projects.feature.assets)
             implementation(projects.core.designsystem)
             implementation(projects.domain)
             implementation(projects.core.common)

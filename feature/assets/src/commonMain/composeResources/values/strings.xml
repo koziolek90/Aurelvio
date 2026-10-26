@@ -1,0 +1,18 @@
+<resources>
+    <string name="add_asset_title">New asset</string>
+    <string name="add_asset_name_label">Asset name</string>
+    <string name="add_asset_name_placeholder">e.g. Pekao Savings Account</string>
+    <string name="add_asset_category_label">Category</string>
+    <string name="add_asset_color_label">Color</string>
+    <string name="add_asset_initial_value_label">Initial value</string>
+    <string name="add_asset_initial_value_placeholder">0</string>
+    <string name="add_asset_initial_value_currency">PLN</string>
+    <string name="add_asset_initial_value_contribution_label">Count initial amount as contribution</string>
+    <string name="add_asset_initial_value_contribution_hint">If checked, initial value will increase total net contributions.</string>
+    <string name="add_asset_save_button">Save asset</string>
+    <string name="add_asset_error_blank_name">Asset name cannot be empty</string>
+    <string name="add_asset_error_negative_value">Initial value cannot be negative</string>
+    <string name="add_asset_error_invalid_value">Invalid amount entered</string>
+    <string name="add_asset_error_generic">Failed to create asset. Please try again.</string>
+    <string name="add_asset_back_content_description">Go back</string>
+</resources>

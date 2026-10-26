@@ -1,0 +1,18 @@
+<resources>
+    <string name="add_asset_title">Nowe aktywo</string>
+    <string name="add_asset_name_label">Nazwa aktywa</string>
+    <string name="add_asset_name_placeholder">np. Konto Oszczędnościowe Pekao</string>
+    <string name="add_asset_category_label">Kategoria</string>
+    <string name="add_asset_color_label">Kolor</string>
+    <string name="add_asset_initial_value_label">Kwota początkowa</string>
+    <string name="add_asset_initial_value_placeholder">0</string>
+    <string name="add_asset_initial_value_currency">PLN</string>
+    <string name="add_asset_initial_value_contribution_label">Licz pierwszą kwotę jako dopłatę</string>
+    <string name="add_asset_initial_value_contribution_hint">Jeśli zaznaczone, pierwsza kwota zwiększy sumę dopłat netto.</string>
+    <string name="add_asset_save_button">Zapisz aktywo</string>
+    <string name="add_asset_error_blank_name">Nazwa aktywa nie może być pusta</string>
+    <string name="add_asset_error_negative_value">Kwota początkowa nie może być ujemna</string>
+    <string name="add_asset_error_invalid_value">Wprowadzono nieprawidłową kwotę</string>
+    <string name="add_asset_error_generic">Nie udało się utworzyć aktywa. Spróbuj ponownie.</string>
+    <string name="add_asset_back_content_description">Wróć</string>
+</resources>

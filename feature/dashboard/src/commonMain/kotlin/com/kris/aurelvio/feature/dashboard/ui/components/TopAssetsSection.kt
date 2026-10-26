@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import aurelvio.feature.dashboard.generated.resources.Res
@@ -29,6 +28,7 @@ import aurelvio.feature.dashboard.generated.resources.dashboard_top_assets_title
 import com.kris.aurelvio.core.designsystem.components.AurelvioCard
 import com.kris.aurelvio.core.designsystem.theme.AurelvioSpacing
 import com.kris.aurelvio.core.designsystem.theme.AurelvioTheme
+import com.kris.aurelvio.core.designsystem.theme.parseHexColor
 import com.kris.aurelvio.domain.model.AssetId
 import com.kris.aurelvio.feature.dashboard.model.AssetItem
 import com.kris.aurelvio.feature.dashboard.ui.format.MoneyFormatter
@@ -140,19 +140,5 @@ private fun AssetRowItem(
                 fontWeight = FontWeight.Medium,
             )
         }
-    }
-}
-
-private fun parseHexColor(hex: String, fallback: Color): Color {
-    return try {
-        val cleanHex = hex.removePrefix("#")
-        val colorInt = cleanHex.toLong(16)
-        if (cleanHex.length == 6) {
-            Color(colorInt or 0xFF000000L)
-        } else {
-            Color(colorInt)
-        }
-    } catch (_: Exception) {
-        fallback
     }
 }
