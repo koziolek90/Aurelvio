@@ -37,6 +37,9 @@ kotlin {
     }
 
     sourceSets {
+        commonMain.dependencies {
+            implementation(libs.findLibrary("koin-core").get())
+        }
         commonTest.dependencies {
             implementation(libs.findLibrary("kotlin-test").get())
         }
